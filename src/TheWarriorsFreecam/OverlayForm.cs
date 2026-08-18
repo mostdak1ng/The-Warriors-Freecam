@@ -173,7 +173,8 @@ internal sealed class OverlayForm : Form
             : state.CarryPreference ? "ARMED" : "OFF";
         DrawShadowed(
             graphics,
-            $"CARRY {carry}    GOD {(state.GodModeEnabled ? "ON" : "OFF")}    HUD ON",
+            $"CARRY {carry}    GOD {(state.GodModeEnabled ? "ON" : "OFF")}    " +
+                $"WORLD {(state.WorldPaused ? "PAUSED" : "NORMAL")}    HUD ON",
             bodyFont,
             Color.FromArgb(180, 225, 255),
             margin,
@@ -212,21 +213,23 @@ internal sealed class OverlayForm : Form
         [
             "WASD Move   Mouse Look   Q/E Down/Up",
             "Shift Fast   Ctrl Precise",
-            "V Normal   F8 Carry   G God   R Hide HUD   F10 Exit",
+            "V Normal   P Pause World   F8 Carry   G God",
+            "R Hide HUD   F10 Exit",
             "Select+L3 switches directly to controller control",
         ],
         ControlMode.Controller =>
         [
             "LS Move   RS Look   L1/R1 Down/Up",
             "L2 Fast   R2 Precise",
-            "Select+L3 Normal   +R3 Carry   +B God   +Y Hide HUD",
+            "Select+L3 Normal   +Square Pause World   +R3 Carry",
+            "Select+Circle God   +Triangle Hide HUD",
             "Hold Select+Start for 1.5 seconds, then release both",
         ],
         ControlMode.NormalCamera =>
         [
             "V Keyboard & mouse Freecam",
             "Select+L3 Controller Freecam",
-            "F8 Carry   G God   R Hide HUD   F10 Exit",
+            "P Pause World   F8 Carry   G God   R Hide HUD   F10 Exit",
         ],
         ControlMode.WaitingForWorld =>
         [

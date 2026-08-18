@@ -13,6 +13,7 @@ internal enum VirtualKey
     F8 = 0x77,
     F10 = 0x79,
     G = 0x47,
+    P = 0x50,
     Q = 0x51,
     R = 0x52,
     S = 0x53,

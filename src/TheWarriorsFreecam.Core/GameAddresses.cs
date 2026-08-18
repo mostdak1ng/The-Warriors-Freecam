@@ -31,6 +31,8 @@ public static class GameAddresses
     public const ulong PlayerNoTargetBit = 0x0000100000000000;
     public const ulong PlayerSafetyMask = PlayerGodModeBit | PlayerNoTargetBit;
 
+    public const uint WorldTimestep = 0x005102CC;
+
     public const uint PadRefreshCall = 0x001498E0;
     public const uint PadRefreshOriginal = 0x0C0525DC;
     public const uint PadRefreshFunction = 0x00149770;

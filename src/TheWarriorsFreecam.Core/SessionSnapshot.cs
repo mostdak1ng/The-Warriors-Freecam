@@ -33,6 +33,8 @@ public sealed record SessionSnapshot
 
     public bool GamePaused { get; init; }
 
+    public bool WorldPaused { get; init; }
+
     public Vector3? CameraPosition { get; init; }
 
     public Vector3? PlayerPosition { get; init; }

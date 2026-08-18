@@ -1,8 +1,8 @@
-The Warriors Freecam v0.1.6 — Corresponding Source
+The Warriors Freecam v0.2.0 — Corresponding Source
 
 The binary archive is distributed alongside:
 
-    TheWarriorsFreecam-v0.1.6-source.zip
+    TheWarriorsFreecam-v0.2.0-source.zip
 
 That archive contains the complete source used to build the executable,
 including project files, tests, build scripts, GPLv3 license, and third-party

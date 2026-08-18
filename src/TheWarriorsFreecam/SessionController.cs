@@ -18,6 +18,7 @@ internal sealed class SessionController : IDisposable
         VirtualKey.V,
         VirtualKey.F8,
         VirtualKey.G,
+        VirtualKey.P,
         VirtualKey.R,
         VirtualKey.F10,
     ];
@@ -97,6 +98,7 @@ internal sealed class SessionController : IDisposable
         PadCaptureHook? padHook = null;
         CameraController? camera = null;
         PlayerController? player = null;
+        WorldTimeController? worldTime = null;
         Exception? terminalError = null;
         bool cleanupPausedByUs = false;
         bool resumeOwed = false;
@@ -136,6 +138,7 @@ internal sealed class SessionController : IDisposable
 
             camera = new CameraController(client);
             player = new PlayerController(client);
+            worldTime = new WorldTimeController(client);
             keyboard.Synchronize(EdgeKeys);
             logger.Info("session_ready", new
             {
@@ -143,10 +146,11 @@ internal sealed class SessionController : IDisposable
                 cameraPosition = camera.Position,
                 playerObject = $"0x{player.Human:X8}",
                 godMode = player.GodModeEnabled,
+                worldPaused = false,
                 mode = ControlMode.KeyboardAndMouse.ToString(),
             });
 
-            RunLoop(client, padHook, camera, player, gameHandle, token);
+            RunLoop(client, padHook, camera, player, worldTime, gameHandle, token);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
@@ -175,6 +179,19 @@ internal sealed class SessionController : IDisposable
                 catch (Exception error)
                 {
                     logger.Error("cleanup_pause_failed", error);
+                }
+
+                try
+                {
+                    RestoreWorldTime(worldTime, "session_cleanup");
+                }
+                catch (Exception error)
+                {
+                    logger.Error("world_time_restore_failed", error, new
+                    {
+                        reason = "session_cleanup",
+                    });
+                    terminalError ??= error;
                 }
 
                 try
@@ -227,6 +244,7 @@ internal sealed class SessionController : IDisposable
                 Mode = ControlMode.NormalCamera,
                 PadSuppressed = false,
                 CarryActive = false,
+                WorldPaused = worldTime?.IsPaused == true,
                 StatusText = terminalError is null
                     ? "Freecam closed cleanly"
                     : $"Stopped: {terminalError.Message}",
@@ -252,6 +270,7 @@ internal sealed class SessionController : IDisposable
         PadCaptureHook padHook,
         CameraController camera,
         PlayerController player,
+        WorldTimeController worldTime,
         nint initialGameHandle,
         CancellationToken token)
     {
@@ -262,6 +281,7 @@ internal sealed class SessionController : IDisposable
         double nextPlayerRetry = 0;
         double nextOwnershipCheck = 0;
         double nextSuppressionRefresh = 0;
+        double nextWorldTimeEnforce = 0;
         double nextTrace = 0;
         double nextWorldRetry = 0;
         double? controllerExitStarted = null;
@@ -307,6 +327,13 @@ internal sealed class SessionController : IDisposable
                 {
                     logger.Info("keyboard_exit");
                     break;
+                }
+
+                if (mode != ControlMode.WaitingForWorld &&
+                    keyboard.Pressed(VirtualKey.P))
+                {
+                    ToggleWorldTime(worldTime, "keyboard");
+                    nextWorldTimeEnforce = 0;
                 }
 
                 if (keyboard.Pressed(VirtualKey.V))
@@ -435,6 +462,13 @@ internal sealed class SessionController : IDisposable
                 }
 
                 if (!controllerExitArmed &&
+                    ChordPressed(pad, previousPad, PadButtons.Square))
+                {
+                    ToggleWorldTime(worldTime, "controller");
+                    nextWorldTimeEnforce = 0;
+                }
+
+                if (!controllerExitArmed &&
                     pad.IsDown(PadButtons.Select | PadButtons.Start))
                 {
                     controllerExitStarted ??= iterationStart;
@@ -463,6 +497,14 @@ internal sealed class SessionController : IDisposable
             {
                 controllerExitStarted = null;
                 controllerExitArmed = false;
+            }
+
+            if (worldTime.IsPaused &&
+                mode != ControlMode.WaitingForWorld &&
+                iterationStart >= nextWorldTimeEnforce)
+            {
+                worldTime.Enforce();
+                nextWorldTimeEnforce = iterationStart + 0.05;
             }
 
             bool shouldSuppressPad = PadCapturePolicy.ShouldSuppress(
@@ -531,6 +573,7 @@ internal sealed class SessionController : IDisposable
                 }
                 catch (WorldUnavailableException error)
                 {
+                    RestoreWorldTime(worldTime, "world_transition");
                     modeBeforeWait = mode;
                     mode = ControlMode.WaitingForWorld;
                     mouse.Release();
@@ -614,6 +657,7 @@ internal sealed class SessionController : IDisposable
                 PadSuppressed = padSuppressed,
                 GameFocused = focused,
                 GamePaused = gamePaused,
+                WorldPaused = worldTime.IsPaused,
                 CameraPosition = camera.Position,
                 PlayerPosition = playerPosition,
                 CameraObject = camera.CameraObject,
@@ -780,6 +824,41 @@ internal sealed class SessionController : IDisposable
                 error = error.ToString(),
             });
         }
+    }
+
+    private void ToggleWorldTime(WorldTimeController worldTime, string source)
+    {
+        if (worldTime.IsPaused)
+        {
+            RestoreWorldTime(worldTime, $"{source}_toggle");
+            return;
+        }
+
+        WorldTimeChange change = worldTime.Pause();
+        logger.Info("world_time_paused", new
+        {
+            source,
+            originalBits = $"0x{change.OriginalBits:X8}",
+            targetBits = $"0x{change.TargetBits:X8}",
+            originalTimestep = change.OriginalTimestep,
+            targetTimestep = change.TargetTimestep,
+            scale = change.Scale,
+        });
+    }
+
+    private void RestoreWorldTime(WorldTimeController? worldTime, string reason)
+    {
+        if (worldTime is null || !worldTime.IsPaused)
+        {
+            return;
+        }
+
+        float? restored = worldTime.Restore();
+        logger.Info("world_time_restored", new
+        {
+            reason,
+            restoredTimestep = restored,
+        });
     }
 
     private static void SetCarryForCurrentMode(

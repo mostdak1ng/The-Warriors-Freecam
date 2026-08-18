@@ -15,6 +15,7 @@ var tests = new List<(string Name, Action Run)>
     ("MIPS helpers", TestMipsHelpers),
     ("Pad hook blob", TestPadHookBlob),
     ("Pad capture policy", TestPadCapturePolicy),
+    ("World time scaling", TestWorldTimeScaling),
     ("Native handle logging", TestNativeHandleLogging),
 };
 if (args.Contains("--live-preflight", StringComparer.OrdinalIgnoreCase))
@@ -54,12 +55,13 @@ return failures == 0 ? 0 : 1;
 
 static void TestBuildMetadata()
 {
-    Equal("0.1.6", BuildInfo.Version);
+    Equal("0.2.0", BuildInfo.Version);
     Equal("The Warriors Freecam", BuildInfo.ProductName);
-    Equal("Freecam mod by mostdak1ng v0.1.6", BuildInfo.Watermark);
+    Equal("Freecam mod by mostdak1ng v0.2.0", BuildInfo.Watermark);
     Equal("GPL-3.0-only", BuildInfo.License);
     Equal(0x005D9150u, GameAddresses.CameraPriorityPointer);
     Equal(0x005D9158u, GameAddresses.FollowCameraPointer);
+    Equal(0x005102CCu, GameAddresses.WorldTimestep);
 }
 
 static void TestSupportedIdentity()
@@ -226,6 +228,29 @@ static void TestPadCapturePolicy()
     True(PadCapturePolicy.ShouldSuppress(ControlMode.KeyboardAndMouse, true));
     True(!PadCapturePolicy.ShouldSuppress(ControlMode.NormalCamera, true));
     True(!PadCapturePolicy.ShouldSuppress(ControlMode.WaitingForWorld, true));
+}
+
+static void TestWorldTimeScaling()
+{
+    float original = 1f / 30f;
+    uint originalBits = BitConverter.SingleToUInt32Bits(original);
+    WorldTimeChange change = WorldTimeController.Calculate(
+        originalBits, WorldTimeController.DefaultScale);
+    Equal(originalBits, change.OriginalBits);
+    Equal(
+        BitConverter.SingleToUInt32Bits(original * 0.0001f),
+        change.TargetBits);
+    Near(original, change.OriginalTimestep, 0.0000001f);
+    Near(original * 0.0001f, change.TargetTimestep, 0.000000001f);
+    Near(0.0001f, change.Scale, 0.0000001f);
+
+    WorldTimeChange stopped = WorldTimeController.Calculate(originalBits, 0f);
+    Equal(0u, stopped.TargetBits);
+    Throws<ArgumentOutOfRangeException>(() =>
+        WorldTimeController.Calculate(originalBits, 1f));
+    Throws<ArgumentOutOfRangeException>(() =>
+        WorldTimeController.Calculate(originalBits, float.NaN));
+    Throws<InvalidDataException>(() => WorldTimeController.Calculate(0u, 0.0001f));
 }
 
 static void TestLiveSessionSmoke()
