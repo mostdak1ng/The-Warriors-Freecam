@@ -2,8 +2,8 @@
 
 ## 0.2.0 — 2026-08-18
 
-- Added reversible world pause, off by default, using the same 0.01% native
-  timestep scale as MapTriggers.
+- Added reversible world pause, off by default, scaling the native world
+  timestep to 0.01%.
 - Added `P` as the keyboard toggle in every active camera mode and
   `Select+Square` as the controller-Freecam toggle.
 - Added the world-pause state and mode-appropriate hotkeys to the overlay.

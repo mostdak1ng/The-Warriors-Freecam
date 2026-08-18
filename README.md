@@ -165,7 +165,7 @@ World pause starts off. Press `P` in keyboard/mouse Freecam, controller
 Freecam, or normal-camera mode to toggle it. In controller Freecam,
 `Select+Square` provides the same toggle.
 
-Like MapTriggers, this is a practical pause: it reduces the game's native
+This is a practical pause rather than a true one: it reduces the game's native
 world timestep to `0.0001` of its current value, or 0.01%. Actors, mission
 timers, and world simulation are practically frozen while the Freecam and
 overlay continue updating normally.

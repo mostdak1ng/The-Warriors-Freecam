@@ -6,7 +6,7 @@ The binary archive is distributed alongside:
 
 That archive contains the complete source used to build the executable,
 including project files, tests, build scripts, GPLv3 license, and third-party
-notices. It does not require or contain MapTriggers.
+notices.
 
 When redistributing the binary under GPL-3.0-only, keep the Corresponding
 Source available with it in one of the ways permitted by GPLv3 section 6.
