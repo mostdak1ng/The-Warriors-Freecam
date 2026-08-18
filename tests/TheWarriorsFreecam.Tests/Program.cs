@@ -54,9 +54,9 @@ return failures == 0 ? 0 : 1;
 
 static void TestBuildMetadata()
 {
-    Equal("0.1.5", BuildInfo.Version);
+    Equal("0.1.6", BuildInfo.Version);
     Equal("The Warriors Freecam", BuildInfo.ProductName);
-    Equal("Freecam mod by mostdak1ng v0.1.5", BuildInfo.Watermark);
+    Equal("Freecam mod by mostdak1ng v0.1.6", BuildInfo.Watermark);
     Equal("GPL-3.0-only", BuildInfo.License);
     Equal(0x005D9150u, GameAddresses.CameraPriorityPointer);
     Equal(0x005D9158u, GameAddresses.FollowCameraPointer);

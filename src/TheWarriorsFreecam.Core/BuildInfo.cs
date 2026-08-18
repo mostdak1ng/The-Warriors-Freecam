@@ -6,8 +6,8 @@ namespace TheWarriorsFreecam;
 public static class BuildInfo
 {
     public const string ProductName = "The Warriors Freecam";
-    public const string Version = "0.1.5";
-    public const string Watermark = "Freecam mod by mostdak1ng v0.1.5";
+    public const string Version = "0.1.6";
+    public const string Watermark = "Freecam mod by mostdak1ng v0.1.6";
     public const string Copyright = "Copyright (C) 2026 mostdak1ng";
     public const string License = "GPL-3.0-only";
 

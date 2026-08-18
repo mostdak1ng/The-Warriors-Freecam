@@ -24,6 +24,7 @@ internal sealed class SessionController : IDisposable
 
     private readonly SessionLogger logger;
     private readonly bool capturePadInKeyboardMode;
+    private readonly bool returnToFollowCamera;
     private readonly CancellationTokenSource cancellation = new();
     private readonly KeyboardState keyboard = new();
     private readonly MouseCapture mouse = new();
@@ -33,10 +34,12 @@ internal sealed class SessionController : IDisposable
 
     public SessionController(
         SessionLogger logger,
-        bool capturePadInKeyboardMode = false)
+        bool capturePadInKeyboardMode = false,
+        bool returnToFollowCamera = false)
     {
         this.logger = logger;
         this.capturePadInKeyboardMode = capturePadInKeyboardMode;
+        this.returnToFollowCamera = returnToFollowCamera;
     }
 
     public SessionSnapshot Snapshot => Volatile.Read(ref snapshot);
@@ -116,6 +119,7 @@ internal sealed class SessionController : IDisposable
                 gameWindow = GameWindow.Inspect(),
                 pinePort = BuildInfo.DefaultPinePort,
                 capturePadInKeyboardMode,
+                returnToFollowCamera,
             });
 
             resumeOwed = PauseForCodePatch(client, gameHandle, token);
@@ -184,7 +188,7 @@ internal sealed class SessionController : IDisposable
                     terminalError ??= error;
                 }
 
-                if (camera is not null)
+                if (returnToFollowCamera && camera is not null)
                 {
                     TryHandOffToFollow(camera, "session_cleanup");
                 }
@@ -489,7 +493,7 @@ internal sealed class SessionController : IDisposable
                         playerReady = true;
                         mode = modeBeforeWait ?? ControlMode.KeyboardAndMouse;
                         modeBeforeWait = null;
-                        if (mode == ControlMode.NormalCamera)
+                        if (returnToFollowCamera && mode == ControlMode.NormalCamera)
                         {
                             TryHandOffToFollow(camera, "world_recovered_normal_mode");
                         }
@@ -734,7 +738,10 @@ internal sealed class SessionController : IDisposable
                 player.SetAttached(false);
             }
 
-            TryHandOffToFollow(camera, "normal_mode_selected");
+            if (returnToFollowCamera)
+            {
+                TryHandOffToFollow(camera, "normal_mode_selected");
+            }
             padHook.ReleaseSuppression();
         }
         else if (mode is ControlMode.NormalCamera or ControlMode.WaitingForWorld)

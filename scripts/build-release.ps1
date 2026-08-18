@@ -11,8 +11,8 @@ $projectRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $artifacts = [System.IO.Path]::GetFullPath((Join-Path $projectRoot "artifacts"))
 $staging = [System.IO.Path]::GetFullPath((Join-Path $projectRoot ".release-staging"))
 $publish = Join-Path $staging "publish"
-$binaryStage = Join-Path $staging "TheWarriorsFreecam-v0.1.5-windows-x64"
-$sourceStage = Join-Path $staging "TheWarriorsFreecam-v0.1.5-source"
+$binaryStage = Join-Path $staging "TheWarriorsFreecam-v0.1.6-windows-x64"
+$sourceStage = Join-Path $staging "TheWarriorsFreecam-v0.1.6-source"
 $appProject = Join-Path $projectRoot "src\TheWarriorsFreecam\TheWarriorsFreecam.csproj"
 $testProject = Join-Path $projectRoot "tests\TheWarriorsFreecam.Tests\TheWarriorsFreecam.Tests.csproj"
 
@@ -97,6 +97,7 @@ foreach ($file in @(
 )) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $file) -Destination $binaryStage
 }
+Copy-Item -LiteralPath (Join-Path $projectRoot "docs") -Destination $binaryStage -Recurse
 Copy-Item -LiteralPath $publishedExe -Destination $binaryStage
 
 $exeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $publishedExe).Hash.ToLowerInvariant()
@@ -104,7 +105,7 @@ Set-Content -LiteralPath (Join-Path $binaryStage "SHA256SUMS.txt") -Encoding Asc
     "$exeHash  TheWarriorsFreecam.exe"
 )
 
-foreach ($tree in @("src", "tests", "scripts")) {
+foreach ($tree in @("src", "tests", "scripts", "docs")) {
     Copy-SourceTree $tree
 }
 foreach ($file in @(
@@ -119,8 +120,8 @@ foreach ($file in @(
     Copy-Item -LiteralPath (Join-Path $projectRoot $file) -Destination $sourceStage
 }
 
-$binaryZip = Join-Path $artifacts "TheWarriorsFreecam-v0.1.5-windows-x64.zip"
-$sourceZip = Join-Path $artifacts "TheWarriorsFreecam-v0.1.5-source.zip"
+$binaryZip = Join-Path $artifacts "TheWarriorsFreecam-v0.1.6-windows-x64.zip"
+$sourceZip = Join-Path $artifacts "TheWarriorsFreecam-v0.1.6-source.zip"
 foreach ($archive in @($binaryZip, $sourceZip)) {
     if (Test-Path -LiteralPath $archive) {
         Remove-Item -LiteralPath $archive -Force

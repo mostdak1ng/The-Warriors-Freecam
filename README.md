@@ -1,13 +1,13 @@
 # The Warriors Freecam
 
 Standalone Freecam, coordinate display, player carry, and God mode for the
-USA release of *The Warriors* running in PCSX2. The public v0.1.5 build is a
-portable Windows x64 executable: it does not require Python or a separately
+USA release of *The Warriors* running in PCSX2. The public v0.1.6 release is
+a portable Windows x64 executable: it does not require Python or a separately
 installed .NET runtime.
 
 Every official screenshot keeps this visible in the lower-right corner:
 
-`Freecam mod by mostdak1ng v0.1.5`
+`Freecam mod by mostdak1ng v0.1.6`
 
 The watermark cannot be hidden in the official build, even when the rest of
 the HUD is hidden. It identifies the exact version when reporting a bug.
@@ -18,7 +18,9 @@ the HUD is hidden. It identifies the exact version when reporting a bug.
 - PCSX2 with its PINE server reachable on the default TCP port `28011`.
 - *The Warriors* USA: serial `SLUS-21215`, game version `1.03`, CRC
   `B99A75DE`.
-- PCSX2 2.6.3 stable and PCSX2 2.7.522 nightly are tested.
+- PCSX2 stable is supported. Nightly support has been verified specifically
+  with PCSX2 2.7.522; nightly builds change daily, so later builds may require
+  additional testing.
 - Borderless fullscreen is the primary tested display mode. Windowed mode is
   supported. Switching between them while the mod is running should work.
 - Exclusive fullscreen can run the Freecam but cannot display its external
@@ -27,11 +29,40 @@ the HUD is hidden. It identifies the exact version when reporting a bug.
 No administrator rights, Python installation, or external controller library
 is required.
 
+## Recommended PCSX2 settings
+
+### Required: enable PINE
+
+In **Settings > Advanced > PINE Settings**, check **Enable** and leave
+**Slot** at `28011`. The mod cannot connect without this setting.
+
+![PCSX2 PINE settings with Enable checked and slot 28011](docs/images/pcsx2-pine-settings.png)
+
+### Required for the complete HUD: borderless fullscreen
+
+In **Settings > Graphics > Display**, set **Fullscreen Mode** to **Borderless
+Fullscreen**. The Freecam itself can run in exclusive fullscreen, but its
+external overlay and permanent version watermark will not be visible.
+Windowed mode is also supported.
+
+![PCSX2 Graphics settings with Borderless Fullscreen selected](docs/images/pcsx2-borderless-fullscreen.png)
+
+### Optional: hide the cursor in fullscreen
+
+In **Settings > Interface**, check **Hide Cursor In Fullscreen**. This is not
+required, but it greatly improves quality of life when using mouse look.
+
+![PCSX2 Interface settings with Hide Cursor In Fullscreen checked](docs/images/pcsx2-hide-cursor.png)
+
+Other graphics, emulation, and controller settings can remain at the values
+that work best for your system and game.
+
 ## Critical save-state warning
 
-1. Create a backup save state **before** starting the mod.
-2. Do not create or load a save state while the mod is running.
-3. Exit cleanly with `F10`, or hold `Select+Start` for 1.5 seconds while in
+1. Back up your PCSX2 memory card file before using the mod.
+2. Create a backup save state **before** starting the mod.
+3. Do not create or load a save state while the mod is running.
+4. Exit cleanly with `F10`, or hold `Select+Start` for 1.5 seconds while in
    controller mode and then release both buttons when prompted.
 
 A save state made while the mod is active can contain temporary executable
@@ -39,20 +70,31 @@ patches and modified player state. Loading any save state while active can
 also replace the memory that the program owns. The launcher requires explicit
 confirmation of this warning before it will start.
 
+Use the mod at your own risk. The author is not responsible for damage to a
+game save, memory card, or save state.
+
 The program removes its native input hook and restores the player's original
 God/no-target bits on a normal exit. It intentionally does **not** move the
 player back to its starting position and does not load a save state
-automatically. Returning to normal mode hands camera control to the player's
-live follow camera.
+automatically. Returning to normal mode stops overriding the currently active
+game camera, allowing gameplay, scripted, and cutscene cameras to resume their
+own behavior.
 
 ## Running
 
-1. Start PCSX2 and load supported gameplay.
-2. Create the backup save state.
-3. Run `TheWarriorsFreecam.exe`.
-4. Wait for the green preflight result, acknowledge the warning, and choose
+1. Confirm these three PCSX2 settings:
+   - **Required:** enable PINE and use slot `28011`.
+   - **Required for the overlay:** use **Borderless Fullscreen** or windowed
+     mode instead of exclusive fullscreen.
+   - **Optional but strongly recommended:** enable **Hide Cursor In
+     Fullscreen**.
+2. Enter the game with a map loaded, such as the Hangout, a mission, or a
+   Rumble map.
+3. Create the backup save state.
+4. Run `TheWarriorsFreecam.exe`.
+5. Wait for the green preflight result, acknowledge the warning, and choose
    **Start Freecam**.
-5. Click the game window if keyboard/mouse input is paused because PCSX2 is
+6. Click the game window if keyboard/mouse input is paused because PCSX2 is
    not focused.
 
 The session starts with keyboard/mouse Freecam active, player carry off, HUD
@@ -65,6 +107,12 @@ still control the Freecam through Windows, while the game receives a neutral
 Pad 1. Normal-camera mode releases Pad 1 automatically. The option is off by
 default so a physical controller can continue controlling the game alongside
 keyboard/mouse Freecam.
+
+By default, leaving Freecam returns control to whichever camera the game
+currently has active. Enable **Return to player FollowCamera when leaving
+Freecam** if you specifically want the camera to follow the relocated player
+after using carry. This option can override fixed, scripted, or cutscene
+cameras, so it is off by default. It also applies when the program closes.
 
 ## Keyboard and mouse controls
 
@@ -99,9 +147,9 @@ Controller Freecam uses a 10% radial deadzone.
 | Hold `Select+Start` for 1.5 seconds, then release both | Clean exit without leaking `Start` to the game |
 
 Entering with `Select+L3` captures Pad 1 so it controls only the Freecam.
-Leaving controller mode hands control to the player's follow camera and then
-returns Pad 1 to the game. Entering with `V` selects keyboard/mouse Freecam
-and leaves Pad 1 available to the game.
+Leaving controller mode stops overriding the active game camera and then
+returns Pad 1 to the game. Entering with `V` selects keyboard/mouse Freecam and
+leaves Pad 1 available to the game.
 
 The native Pad 1 capture has a guest-side timeout. If the host program stops
 refreshing it unexpectedly, controller input fails open and returns to the
@@ -154,9 +202,9 @@ is sensitive to you.
 - **PINE is not reachable:** start PCSX2, enable its PINE server, use port
   `28011`, load the game, and choose **Recheck**.
 - **Unsupported executable:** use `SLUS-21215` v1.03 with CRC `B99A75DE`.
-- **Another hook is active:** close MapTriggers and other PINE/native tools,
-  then restart the game before using this standalone mod.
-- **Windows SmartScreen appears:** v0.1.5 is not code-signed. Verify the SHA-256
+- **Another hook is active:** close other PINE/native tools, then restart the
+  game before using this standalone mod.
+- **Windows SmartScreen appears:** v0.1.6 is not code-signed. Verify the SHA-256
   checksum distributed with the release before running it.
 - **The overlay is hidden:** restore and focus the PCSX2 game window. If PCSX2
   is using exclusive fullscreen, switch it to borderless fullscreen or
@@ -164,6 +212,12 @@ is sensitive to you.
 - **A save state was loaded accidentally:** exit the mod, close PCSX2 without
   making another save state, restart it, and load the backup created before
   the session.
+
+## Known issues
+
+- Exclusive fullscreen does not support the external overlay or permanent
+  version watermark. The Freecam itself still runs; use borderless fullscreen
+  or windowed mode for the complete interface.
 
 ## Building from source
 
@@ -177,7 +231,7 @@ The script runs the dependency-free test executable, publishes a self-contained
 single-file Win64 app, creates the binary and Corresponding Source archives,
 and writes SHA-256 checksums under `artifacts`.
 
-The v0.1.5 release build is pinned to .NET runtime 8.0.15 so its included
+The v0.1.6 release build is pinned to .NET runtime 8.0.15 so its included
 third-party notices match the runtime payload.
 
 ## License
@@ -191,4 +245,4 @@ under its own terms listed in `THIRD-PARTY-NOTICES.txt`.
 
 GPLv3 permits inspection, modification, redistribution, and forks under its
 terms. A modified build can therefore change the source-level branding; it
-must not be represented as an unmodified official v0.1.5 binary.
+must not be represented as an unmodified official v0.1.6 binary.

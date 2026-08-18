@@ -11,6 +11,7 @@ internal sealed class LauncherForm : Form
     private readonly Label statusLabel;
     private readonly CheckBox warningCheckBox;
     private readonly CheckBox padCaptureCheckBox;
+    private readonly CheckBox followCameraCheckBox;
     private readonly Button startButton;
     private readonly Button recheckButton;
     private readonly Button logsButton;
@@ -23,8 +24,8 @@ internal sealed class LauncherForm : Form
     {
         this.logger = logger;
         Text = $"{BuildInfo.ProductName} v{BuildInfo.Version}";
-        ClientSize = new Size(700, 560);
-        MinimumSize = new Size(716, 599);
+        ClientSize = new Size(700, 625);
+        MinimumSize = new Size(716, 664);
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Color.FromArgb(24, 26, 31);
         ForeColor = Color.White;
@@ -96,19 +97,31 @@ internal sealed class LauncherForm : Form
             Checked = false,
         };
 
+        followCameraCheckBox = new CheckBox
+        {
+            AutoSize = false,
+            Text = "Return to player FollowCamera when leaving Freecam " +
+                "(off by default; can override fixed or cutscene cameras).",
+            ForeColor = Color.White,
+            Location = new Point(31, 341),
+            Size = new Size(638, 50),
+            UseVisualStyleBackColor = true,
+            Checked = false,
+        };
+
         statusLabel = new Label
         {
             AutoSize = false,
             Text = "Checking PCSX2 and the running game…",
             ForeColor = Color.FromArgb(190, 200, 215),
-            Location = new Point(31, 351),
+            Location = new Point(31, 405),
             Size = new Size(638, 48),
         };
 
-        startButton = CreateButton("Start Freecam", new Point(30, 417), 190, true);
-        recheckButton = CreateButton("Recheck", new Point(232, 417), 132, false);
-        logsButton = CreateButton("Open Logs", new Point(376, 417), 132, false);
-        Button exitButton = CreateButton("Exit", new Point(520, 417), 150, false);
+        startButton = CreateButton("Start Freecam", new Point(30, 472), 190, true);
+        recheckButton = CreateButton("Recheck", new Point(232, 472), 132, false);
+        logsButton = CreateButton("Open Logs", new Point(376, 472), 132, false);
+        Button exitButton = CreateButton("Exit", new Point(520, 472), 150, false);
         startButton.Enabled = false;
         startButton.Click += async (_, _) => await StartSessionAsync();
         recheckButton.Click += async (_, _) => await RunPreflightAsync();
@@ -121,7 +134,7 @@ internal sealed class LauncherForm : Form
             Text = "Start mode: keyboard & mouse Freecam • Carry off • God mode on\r\n" +
                 "Clean exit: F10 or hold Select+Start for 1.5 seconds, then release both.",
             ForeColor = Color.FromArgb(150, 160, 175),
-            Location = new Point(31, 485),
+            Location = new Point(31, 540),
             Size = new Size(638, 45),
         };
 
@@ -132,6 +145,7 @@ internal sealed class LauncherForm : Form
             requirement,
             warningPanel,
             padCaptureCheckBox,
+            followCameraCheckBox,
             statusLabel,
             startButton,
             recheckButton,
@@ -221,8 +235,12 @@ internal sealed class LauncherForm : Form
             backupSaveStateConfirmed = true,
             noSaveStatesWhileRunningConfirmed = true,
             capturePadInKeyboardMode = padCaptureCheckBox.Checked,
+            returnToFollowCamera = followCameraCheckBox.Checked,
         });
-        session = new SessionController(logger, padCaptureCheckBox.Checked);
+        session = new SessionController(
+            logger,
+            padCaptureCheckBox.Checked,
+            followCameraCheckBox.Checked);
         overlay = new OverlayForm(session);
         Hide();
         overlay.Show();
@@ -262,6 +280,7 @@ internal sealed class LauncherForm : Form
         UseWaitCursor = busy;
         recheckButton.Enabled = !busy && session is null;
         padCaptureCheckBox.Enabled = !busy && session is null;
+        followCameraCheckBox.Enabled = !busy && session is null;
         RefreshStartAvailability(busy);
     }
 

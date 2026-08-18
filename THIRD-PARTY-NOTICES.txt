@@ -1,4 +1,4 @@
-The Warriors Freecam v0.1.5
+The Warriors Freecam v0.1.6
 Third-Party Notices
 
 The self-contained Windows binary includes components from the .NET 8 runtime
