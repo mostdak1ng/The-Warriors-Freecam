@@ -329,7 +329,7 @@ internal sealed class LauncherForm : Form
         if (error.GetBaseException() is System.Net.Sockets.SocketException)
         {
             return "PCSX2 PINE was not reachable on port 28011. Start PCSX2, " +
-                "enable PINE, load the supported game, and press Recheck.";
+                "enable PINE, restart PCSX2, load the supported game, and press Recheck.";
         }
 
         return $"Not ready: {message}";

@@ -34,7 +34,8 @@ is required.
 ### Required: enable PINE
 
 In **Settings > Advanced > PINE Settings**, check **Enable** and leave
-**Slot** at `28011`. The mod cannot connect without this setting.
+**Slot** at `28011`, then restart PCSX2. The PINE server is not available to
+the mod until PCSX2 has been restarted after enabling it.
 
 ![PCSX2 PINE settings with Enable checked and slot 28011](docs/images/pcsx2-pine-settings.png)
 
@@ -83,7 +84,8 @@ own behavior.
 ## Running
 
 1. Confirm these three PCSX2 settings:
-   - **Required:** enable PINE and use slot `28011`.
+   - **Required:** enable PINE, use slot `28011`, and restart PCSX2 after
+     changing the setting.
    - **Required for the overlay:** use **Borderless Fullscreen** or windowed
      mode instead of exclusive fullscreen.
    - **Optional but strongly recommended:** enable **Hide Cursor In
@@ -199,8 +201,8 @@ is sensitive to you.
 
 ## Troubleshooting
 
-- **PINE is not reachable:** start PCSX2, enable its PINE server, use port
-  `28011`, load the game, and choose **Recheck**.
+- **PINE is not reachable:** enable its PINE server, use port `28011`, restart
+  PCSX2, load the game, and choose **Recheck**.
 - **Unsupported executable:** use `SLUS-21215` v1.03 with CRC `B99A75DE`.
 - **Another hook is active:** close other PINE/native tools, then restart the
   game before using this standalone mod.

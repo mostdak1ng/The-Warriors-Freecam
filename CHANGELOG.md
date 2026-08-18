@@ -19,4 +19,5 @@
 - Confirmed support for PCSX2 stable and PCSX2 2.7.522 nightly.
 - Clarified supported PCSX2 channels, loaded-map requirements, memory-card
   backup guidance, recommended emulator settings, and troubleshooting.
+- Documented that PCSX2 must be restarted after enabling its PINE server.
 - Documented exclusive-fullscreen overlay limitations as a known issue.
