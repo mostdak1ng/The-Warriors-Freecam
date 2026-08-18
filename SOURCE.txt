@@ -1,0 +1,15 @@
+The Warriors Freecam v0.1.5 — Corresponding Source
+
+The binary archive is distributed alongside:
+
+    TheWarriorsFreecam-v0.1.5-source.zip
+
+That archive contains the complete source used to build the executable,
+including project files, tests, build scripts, GPLv3 license, and third-party
+notices. It does not require or contain MapTriggers.
+
+When redistributing the binary under GPL-3.0-only, keep the Corresponding
+Source available with it in one of the ways permitted by GPLv3 section 6.
+
+Copyright (C) 2026 mostdak1ng
+SPDX-License-Identifier: GPL-3.0-only

@@ -1,0 +1,8 @@
+artifacts/
+.offline-packages/
+.release-staging/
+**/bin/
+**/obj/
+logs/
+*.user
+*.suo
